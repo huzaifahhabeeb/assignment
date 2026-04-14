@@ -222,3 +222,42 @@ def delete_expense(expenses):
     else:
         print("  Deletion cancelled.")
  
+ # ─── Utility Functions ────────────────────────────────────────────────────────
+ 
+def calculate_total(expenses):
+    """
+    Add up all expense amounts and print the total.
+    Also shows a breakdown by category.
+    """
+    if not expenses:
+        return
+ 
+    total = sum(e["amount"] for e in expenses)
+    print(f"\n  {'Total:':<25} £{total:.2f}")
+ 
+    # Category breakdown using a dictionary
+    breakdown = {}
+    for e in expenses:
+        cat = e["category"]
+        if cat not in breakdown:
+            breakdown[cat] = 0
+        breakdown[cat] += e["amount"]
+ 
+    print("\n  Breakdown by category:")
+    for cat, subtotal in breakdown.items():
+        print(f"    {cat:<20} £{subtotal:.2f}")
+ 
+ 
+def display_menu():
+    """Print the main menu options."""
+    print("\n════════════════════════════════════")
+    print("       EXPENSE TRACKER")
+    print("════════════════════════════════════")
+    print("  1. Add expense")
+    print("  2. View all expenses")
+    print("  3. Edit expense")
+    print("  4. Delete expense")
+    print("  5. View total & breakdown")
+    print("  6. Exit")
+    print("────────────────────────────────────")
+ 
