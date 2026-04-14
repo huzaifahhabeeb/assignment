@@ -12,3 +12,7 @@ used AI to give an idea of how to structure the code and to generate some of the
 import csv
 import os
 from datetime import date
+
+# ─── Constants ────────────────────────────────────────────────────────────────
+FILE_NAME = "expenses.csv"
+CATEGORIES = ["Food", "Transport", "Shopping", "Health", "Entertainment", "Other"]
