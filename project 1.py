@@ -261,3 +261,38 @@ def display_menu():
     print("  6. Exit")
     print("────────────────────────────────────")
  
+ # ─── Main Loop ────────────────────────────────────────────────────────────────
+ 
+def main():
+    """
+    Entry point. Loads existing data, then runs the menu loop
+    until the user chooses to exit.
+    """
+    expenses = load_expenses()
+    print(f"\n  Loaded {len(expenses)} expense(s) from file.")
+ 
+    while True:
+        display_menu()
+        choice = input("  Choose an option (1-6): ").strip()
+ 
+        if choice == "1":
+            add_expense(expenses)
+        elif choice == "2":
+            view_expenses(expenses)
+        elif choice == "3":
+            edit_expense(expenses)
+        elif choice == "4":
+            delete_expense(expenses)
+        elif choice == "5":
+            print("\n── Totals ───────────────────────────")
+            calculate_total(expenses)
+        elif choice == "6":
+            print("\n  Goodbye. Your data has been saved.\n")
+            break
+        else:
+            print("  Invalid option — please enter a number between 1 and 6.")
+ 
+ 
+# Run the program
+if __name__ == "__main__":
+    main()
