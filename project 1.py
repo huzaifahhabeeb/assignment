@@ -100,4 +100,125 @@ def generate_id(expenses):
     # Find the highest existing ID and add 1
     max_id = max(int(e["id"]) for e in expenses)
     return str(max_id + 1)
+
+# ─── Core CRUD Functions ──────────────────────────────────────────────────────
+ 
+def add_expense(expenses):
+    """CREATE — Add a new expense to the list and save to file."""
+    print("\n── Add Expense ──────────────────────")
+ 
+    description = input("  Description: ").strip()
+    if not description:
+        print("  Description cannot be empty. Returning to menu.")
+        return
+ 
+    amount = get_valid_amount("  Amount (£): ")
+    category = get_valid_category()
+    today = date.today().strftime("%Y-%m-%d")
+ 
+    new_expense = {
+        "id": generate_id(expenses),
+        "description": description,
+        "amount": amount,
+        "category": category,
+        "date": today
+    }
+ 
+    expenses.append(new_expense)
+    save_expenses(expenses)
+    print(f"\n  ✓ Expense added: {description} — £{amount:.2f} ({category})")
+ 
+ 
+def view_expenses(expenses):
+    """READ — Display all expenses in a formatted table."""
+    print("\n── All Expenses ─────────────────────")
+ 
+    if not expenses:
+        print("  No expenses recorded yet.")
+        return
+ 
+    # Print header row
+    print(f"  {'ID':<5} {'Description':<20} {'Amount':>8}  {'Category':<15} {'Date'}")
+    print("  " + "-" * 62)
+ 
+    for e in expenses:
+        print(f"  {e['id']:<5} {e['description']:<20} £{e['amount']:>7.2f}  {e['category']:<15} {e['date']}")
+ 
+    # Show running total at the bottom
+    calculate_total(expenses)
+ 
+ 
+def edit_expense(expenses):
+    """UPDATE — Find an expense by ID and let the user change its fields."""
+    print("\n── Edit Expense ─────────────────────")
+ 
+    if not expenses:
+        print("  No expenses to edit.")
+        return
+ 
+    view_expenses(expenses)
+    expense_id = input("\n  Enter the ID of the expense to edit: ").strip()
+ 
+    # Find the expense with a matching ID
+    target = None
+    for e in expenses:
+        if e["id"] == expense_id:
+            target = e
+            break
+ 
+    if target is None:
+        print("  No expense found with that ID.")
+        return
+ 
+    print(f"\n  Editing: {target['description']} — £{target['amount']:.2f}")
+    print("  (Press Enter to keep the current value)\n")
+ 
+    # Only update fields the user provides input for
+    new_desc = input(f"  New description [{target['description']}]: ").strip()
+    if new_desc:
+        target["description"] = new_desc
+ 
+    change_amount = input(f"  Change amount? Current: £{target['amount']:.2f} (y/n): ").strip().lower()
+    if change_amount == "y":
+        target["amount"] = get_valid_amount("  New amount (£): ")
+ 
+    change_cat = input(f"  Change category? Current: {target['category']} (y/n): ").strip().lower()
+    if change_cat == "y":
+        target["category"] = get_valid_category()
+ 
+    save_expenses(expenses)
+    print("\n  ✓ Expense updated.")
+ 
+ 
+def delete_expense(expenses):
+    """DELETE — Remove an expense by ID after confirmation."""
+    print("\n── Delete Expense ───────────────────")
+ 
+    if not expenses:
+        print("  No expenses to delete.")
+        return
+ 
+    view_expenses(expenses)
+    expense_id = input("\n  Enter the ID of the expense to delete: ").strip()
+ 
+    # Search for the expense
+    target = None
+    for e in expenses:
+        if e["id"] == expense_id:
+            target = e
+            break
+ 
+    if target is None:
+        print("  No expense found with that ID.")
+        return
+ 
+    # Confirm before deleting
+    confirm = input(f"  Delete '{target['description']}' (£{target['amount']:.2f})? (y/n): ").strip().lower()
+ 
+    if confirm == "y":
+        expenses.remove(target)
+        save_expenses(expenses)
+        print("  ✓ Expense deleted.")
+    else:
+        print("  Deletion cancelled.")
  
