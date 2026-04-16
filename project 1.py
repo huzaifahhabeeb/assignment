@@ -23,6 +23,7 @@ def load_expenses():
     """
     Read expenses from the CSV file and return them as a list of dicts.
     If the file doesn't exist yet, return an empty list.
+    AI-assisted
     """
     expenses = []
  
@@ -76,6 +77,7 @@ def get_valid_category():
     """
     Show the category list and return the user's valid choice.
     Uses a simple numbered menu with an if/else guard.
+    AI-assisted
     """
     print("\n  Categories:")
     for i, cat in enumerate(CATEGORIES, start=1):
@@ -93,6 +95,7 @@ def generate_id(expenses):
     """
     Generate the next unique ID based on the current list.
     If the list is empty, start at 1.
+    AI-assisted
     """
     if not expenses:
         return "1"
@@ -103,7 +106,8 @@ def generate_id(expenses):
 # Core CRUD Functions
  
 def add_expense(expenses):
-    """CREATE — Add a new expense to the list and save to file."""
+    """CREATE — Add a new expense to the list and save to file.
+    AI-assisted"""
     print("\n── Add Expense ──────────────────────")
  
     description = input("  Description: ").strip()
@@ -129,7 +133,8 @@ def add_expense(expenses):
  
  
 def view_expenses(expenses):
-    """READ — Display all expenses in a formatted table."""
+    """READ — Display all expenses in a formatted table.
+    AI-assisted"""
     print("\n── All Expenses ─────────────────────")
  
     if not expenses:
@@ -148,7 +153,8 @@ def view_expenses(expenses):
  
  
 def edit_expense(expenses):
-    """UPDATE — Find an expense by ID and let the user change its fields."""
+    """UPDATE — Find an expense by ID and let the user change its fields.
+    AI-assisted"""
     print("\n── Edit Expense ─────────────────────")
  
     if not expenses:
@@ -190,7 +196,8 @@ def edit_expense(expenses):
  
  
 def delete_expense(expenses):
-    """DELETE — Remove an expense by ID after confirmation."""
+    """DELETE — Remove an expense by ID after confirmation.
+    AI-assisted"""
     print("\n── Delete Expense ───────────────────")
  
     if not expenses:
@@ -227,6 +234,7 @@ def calculate_total(expenses):
     """
     Add up all expense amounts and print the total.
     Also shows a breakdown by category.
+    AI-assisted
     """
     if not expenses:
         return
@@ -266,6 +274,7 @@ def main():
     """
     Entry point. Loads existing data, then runs the menu loop
     until the user chooses to exit.
+    AI-assisted
     """
     expenses = load_expenses()
     print(f"\n  Loaded {len(expenses)} expense(s) from file.")
