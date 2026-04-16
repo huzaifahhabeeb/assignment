@@ -1,6 +1,5 @@
 """
 Expense Tracker
-Author: Huzaifah Habeeb
 Description: A command-line expense tracker that lets users add, view,
              edit and delete expenses. Data is saved to a CSV file so
              it persists between sessions.
@@ -13,12 +12,12 @@ import csv
 import os
 from datetime import date
 
-# ─── Constants ────────────────────────────────────────────────────────────────
+# Constants
 
 FILE_NAME = "expenses.csv"
 CATEGORIES = ["Food", "Transport", "Shopping", "Health", "Entertainment", "Other"]
 
-# ─── File Handling ────────────────────────────────────────────────────────────
+# File Handling
  
 def load_expenses():
     """
@@ -53,7 +52,7 @@ def save_expenses(expenses):
         writer.writeheader()
         writer.writerows(expenses)
  
- # ─── Input Validation Helpers ─────────────────────────────────────────────────
+ # Input Validation Helpers
  
 def get_valid_amount(prompt):
     """
@@ -101,7 +100,7 @@ def generate_id(expenses):
     max_id = max(int(e["id"]) for e in expenses)
     return str(max_id + 1)
 
-# ─── Core CRUD Functions ──────────────────────────────────────────────────────
+# Core CRUD Functions
  
 def add_expense(expenses):
     """CREATE — Add a new expense to the list and save to file."""
@@ -222,7 +221,7 @@ def delete_expense(expenses):
     else:
         print("  Deletion cancelled.")
  
- # ─── Utility Functions ────────────────────────────────────────────────────────
+ # Utility Functions
  
 def calculate_total(expenses):
     """
@@ -261,7 +260,7 @@ def display_menu():
     print("  6. Exit")
     print("────────────────────────────────────")
  
- # ─── Main Loop ────────────────────────────────────────────────────────────────
+ # Main Loop
  
 def main():
     """
