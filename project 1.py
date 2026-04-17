@@ -4,10 +4,14 @@ Description: A command-line expense tracker that lets users add, view,
              edit and delete expenses. Data is saved to a CSV file so
              it persists between sessions.
  
-AI Usage Notes:
+AI Usage and other Notes:
 used AI to give an idea of how to structure the code and to generate some of the functions.
+used triple quotes, like i am right now, to write docstrings for each function, which explain what they do and how they work. This is to make the code easier to understand and maintain.
+i also added comments throughout the code to explain specific lines or blocks, especially where the AI-generated code might be doing something non-obvious. This way, if someone else (or future me) looks at this code later, they can quickly understand the logic without having to decipher it from scratch.
+there's also a comment at the top of each major section (like "File Handling" and "Core CRUD Functions") to break it up and make it easier to navigate.
 """
 
+# importing necessary libraries for file handling and date management
 import csv
 import os
 from datetime import date
@@ -28,14 +32,14 @@ def load_expenses():
     expenses = []
  
     if not os.path.exists(FILE_NAME):
-        return expenses  # No file yet — first run
+        return expenses  # Checks if file exists, pevents error if it doesn't
  
-    with open(FILE_NAME, newline="") as file:
-        reader = csv.DictReader(file)
+    with open(FILE_NAME, newline="") as file: # opens the CSV file safely. The with keyword automatically closes the file when done, even if something goes wrong
+        reader = csv.DictReader(file) # reads each row of the CSV as a dictionary, so you can access values by name like row["amount"] instead of by position
         for row in reader:
             # Convert amount back to float (CSV stores everything as strings)
             row["amount"] = float(row["amount"])
-            expenses.append(row)
+            expenses.append(row) # adds each row into the list
  
     return expenses
  
@@ -46,12 +50,12 @@ def save_expenses(expenses):
     Called after every change so data is never lost.
     """
     # AI-assisted: Claude suggested using DictWriter for clean CSV output
-    fieldnames = ["id", "description", "amount", "category", "date"]
+    fieldnames = ["id", "description", "amount", "category", "date"] # defines the column names for the CSV
  
-    with open(FILE_NAME, "w", newline="") as file:
+    with open(FILE_NAME, "w", newline="") as file: # opens the file in write mode. The "w" means it overwrites whatever was there before
         writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(expenses)
+        writer.writeheader() # writes the column names as the first row
+        writer.writerows(expenses) # writes every expense in the list as a row
  
  # Input Validation Helpers
  
@@ -61,9 +65,9 @@ def get_valid_amount(prompt):
     AI-assisted: Claude suggested the try/except structure.
     I added the negative number check myself.
     """
-    while True:
-        user_input = input(prompt).strip()
-        try:
+    while True: # loops forever until we deliberately break out of it with return
+        user_input = input(prompt).strip() # removes any accidental spaces the user might have typed
+        try: # this is error handling. You "try" to convert the input to a float. If it fails (e.g. the user typed "abc"), Python throws a ValueError and instead of crashing, the except block catches it and prints a helpful message
             amount = float(user_input)
             if amount <= 0:
                 print("  Amount must be greater than zero. Try again.")
@@ -79,14 +83,14 @@ def get_valid_category():
     Uses a simple numbered menu with an if/else guard.
     AI-assisted
     """
-    print("\n  Categories:")
-    for i, cat in enumerate(CATEGORIES, start=1):
-        print(f"    {i}. {cat}")
+    print("\n  Categories:") # new line 
+    for i, cat in enumerate(CATEGORIES, start=1): # loops through the list and gives each item a number starting at 1. So i is the number, cat is the category name
+        print(f"    {i}. {cat}") # The f"..." strings are f-strings — they let you put variables directly inside {}
  
     while True:
         choice = input("  Choose a category (1-6): ").strip()
-        if choice.isdigit() and 1 <= int(choice) <= len(CATEGORIES):
-            return CATEGORIES[int(choice) - 1]
+        if choice.isdigit() and 1 <= int(choice) <= len(CATEGORIES): #  checks if what they typed is actually a number before trying to use it as one. Prevents crashes
+            return CATEGORIES[int(choice) - 1] #  the -1 is because lists in Python start at index 0, but our menu starts at 1. So if the user picks 1, we want index 0
         else:
             print("  Please enter a number between 1 and 6.")
  
@@ -97,11 +101,10 @@ def generate_id(expenses):
     If the list is empty, start at 1.
     AI-assisted
     """
-    if not expenses:
+    if not expenses: # if the list is empty, just return "1" as the first ID
         return "1"
-    # Find the highest existing ID and add 1
-    max_id = max(int(e["id"]) for e in expenses)
-    return str(max_id + 1)
+    max_id = max(int(e["id"]) for e in expenses) # loops through all expenses, converts their IDs to integers, and finds the highest one
+    return str(max_id + 1) # adds 1 to the highest ID and converts it back to a string (because the CSV stores everything as text)
 
 # Core CRUD Functions
  
@@ -111,15 +114,15 @@ def add_expense(expenses):
     print("\n── Add Expense ──────────────────────")
  
     description = input("  Description: ").strip()
-    if not description:
+    if not description: # catches empty input. If the user just pressed Enter without typing anything, we stop here
         print("  Description cannot be empty. Returning to menu.")
         return
  
     amount = get_valid_amount("  Amount (£): ")
     category = get_valid_category()
-    today = date.today().strftime("%Y-%m-%d")
+    today = date.today().strftime("%Y-%m-%d") # gets today's date and formats it as "2025-01-14"
  
-    new_expense = {
+    new_expense = { # builds a dictionary with all the expense details
         "id": generate_id(expenses),
         "description": description,
         "amount": amount,
@@ -127,8 +130,8 @@ def add_expense(expenses):
         "date": today
     }
  
-    expenses.append(new_expense)
-    save_expenses(expenses)
+    expenses.append(new_expense) #  adds it to the list in memory
+    save_expenses(expenses) # immediately writes it to the CSV so it's not lost
     print(f"\n  ✓ Expense added: {description} — £{amount:.2f} ({category})")
  
  
@@ -137,16 +140,16 @@ def view_expenses(expenses):
     AI-assisted"""
     print("\n── All Expenses ─────────────────────")
  
-    if not expenses:
+    if not expenses: # nothing to show, so exit early
         print("  No expenses recorded yet.")
         return
  
     # Print header row
-    print(f"  {'ID':<5} {'Description':<20} {'Amount':>8}  {'Category':<15} {'Date'}")
+    print(f"  {'ID':<5} {'Description':<20} {'Amount':>8}  {'Category':<15} {'Date'}") # The f"..." strings are f-strings — they let you put variables directly inside {}. The :<5 and :>8 parts control the spacing and alignment so the columns line up neatly
     print("  " + "-" * 62)
  
     for e in expenses:
-        print(f"  {e['id']:<5} {e['description']:<20} £{e['amount']:>7.2f}  {e['category']:<15} {e['date']}")
+        print(f"  {e['id']:<5} {e['description']:<20} £{e['amount']:>7.2f}  {e['category']:<15} {e['date']}") # the .2f means show exactly 2 decimal places
  
     # Show running total at the bottom
     calculate_total(expenses)
@@ -164,7 +167,7 @@ def edit_expense(expenses):
     view_expenses(expenses)
     expense_id = input("\n  Enter the ID of the expense to edit: ").strip()
  
-    # Find the expense with a matching ID
+    # Find the expense with a matching ID It loops through all expenses comparing IDs until it finds a match
     target = None
     for e in expenses:
         if e["id"] == expense_id:
@@ -175,15 +178,15 @@ def edit_expense(expenses):
         print("  No expense found with that ID.")
         return
  
-    print(f"\n  Editing: {target['description']} — £{target['amount']:.2f}")
-    print("  (Press Enter to keep the current value)\n")
+    print(f"\n  Editing: {target['description']} — £{target['amount']:.2f}") # Because target points directly to the expense inside the expenses list, changing target["description"] changes it in the list too — no need to find it again
+    print("  (Press Enter to keep the current value)\n") # For each field, it only updates if the user actually typed something — if they just pressed Enter, the original value is kept
  
     # Only update fields the user provides input for
     new_desc = input(f"  New description [{target['description']}]: ").strip()
     if new_desc:
         target["description"] = new_desc
  
-    change_amount = input(f"  Change amount? Current: £{target['amount']:.2f} (y/n): ").strip().lower()
+    change_amount = input(f"  Change amount? Current: £{target['amount']:.2f} (y/n): ").strip().lower() # .lower() converts whatever they type to lowercase, so "Y", "y" and "YES" would all work for the first letter check
     if change_amount == "y":
         target["amount"] = get_valid_amount("  New amount (£): ")
  
@@ -222,7 +225,7 @@ def delete_expense(expenses):
     confirm = input(f"  Delete '{target['description']}' (£{target['amount']:.2f})? (y/n): ").strip().lower()
  
     if confirm == "y":
-        expenses.remove(target)
+        expenses.remove(target) # removes that specific dictionary object from the list
         save_expenses(expenses)
         print("  ✓ Expense deleted.")
     else:
@@ -239,16 +242,16 @@ def calculate_total(expenses):
     if not expenses:
         return
  
-    total = sum(e["amount"] for e in expenses)
+    total = sum(e["amount"] for e in expenses) #  loops through every expense and adds up all the amounts in one line
     print(f"\n  {'Total:':<25} £{total:.2f}")
  
     # Category breakdown using a dictionary
-    breakdown = {}
+    breakdown = {} # an empty dictionary that will store category totals
     for e in expenses:
         cat = e["category"]
-        if cat not in breakdown:
+        if cat not in breakdown: #  if we haven't seen this category before, create it with a starting value of 0
             breakdown[cat] = 0
-        breakdown[cat] += e["amount"]
+        breakdown[cat] += e["amount"] # add the amount to that category's running total
  
     print("\n  Breakdown by category:")
     for cat, subtotal in breakdown.items():
@@ -276,10 +279,10 @@ def main():
     until the user chooses to exit.
     AI-assisted
     """
-    expenses = load_expenses()
+    expenses = load_expenses() # runs once at the start to get saved data
     print(f"\n  Loaded {len(expenses)} expense(s) from file.")
  
-    while True:
+    while True: # keeps the menu looping forever until the user picks 6 to exit
         display_menu()
         choice = input("  Choose an option (1-6): ").strip()
  
